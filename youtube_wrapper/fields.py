@@ -1,7 +1,11 @@
 # coding: utf-8
-
-import urlparse
 import re
+
+try:
+    import urlparse
+except ImportError
+    import urllib.parse as urlparse
+
 
 from django.db import models
 from django import forms
