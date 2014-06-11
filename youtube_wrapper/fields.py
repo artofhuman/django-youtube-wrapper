@@ -68,7 +68,7 @@ class YoutubeField(models.URLField):
         return YoutubeUrl(url)
 
     def get_prep_value(self, value):
-        return unicode(value)
+        return str(value)
 
 try:
     from south.modelsinspector import add_introspection_rules
