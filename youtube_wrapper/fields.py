@@ -12,20 +12,19 @@ from django import forms
 from django.utils.translation import ugettext_lazy as _
 
 
-def validate_youtube_url(value):
+def validate_youtube_url(url):
     """
     http://stackoverflow.com/questions/2964678/jquery-youtube-url-validation-with-regex
     """
     pattern = r'^http:\/\/(?:www\.)?youtube.com\/watch\?(?=.*v=\w+)(?:\S+)?$'
-
-    if value[:16] == 'http://youtu.be/':
-        if re.match(r'\w+', value[16:]) is None:
+    if url.parsed_url.netloc == 'youtu.be':
+        if re.match(r'\w+', url.origin_url) is None:
             raise forms.ValidationError(_('Youtube url has not video param'))
-    elif re.match(pattern, value) is None:
+    elif re.match(pattern, url.origin_url) is None:
         raise forms.ValidationError(_('Invalid youtube url'))
 
 
-class YoutubeUrl(str):
+class YoutubeUrl(object):
 
     def __init__(self, url):
         self.origin_url = url
@@ -55,9 +54,15 @@ class YoutubeUrl(str):
         """
         return bool(self.parsed_url.netloc == 'youtu.be')
 
+    def __len__(self):
+        return len(self.origin_url) if self.origin_url else 0
 
-class YoutubeField(models.URLField):
-    __metaclass__ = models.SubfieldBase
+    def __str__(self):
+        return self.origin_url
+
+
+class YoutubeField(models.URLField, metaclass=models.SubfieldBase):
+    description = _("Youtube video URL")
 
     def __init__(self, *args, **kwargs):
         super(YoutubeField, self).__init__(*args, **kwargs)
@@ -68,7 +73,8 @@ class YoutubeField(models.URLField):
         return YoutubeUrl(url)
 
     def get_prep_value(self, value):
-        return str(value)
+        return self.to_python(value)
+
 
 try:
     from south.modelsinspector import add_introspection_rules
