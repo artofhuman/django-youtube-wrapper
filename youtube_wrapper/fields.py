@@ -25,7 +25,7 @@ def validate_youtube_url(value):
         raise forms.ValidationError(_('Invalid youtube url'))
 
 
-class YoutubeUrl(object):
+class YoutubeUrl(str):
 
     def __init__(self, url):
         self.origin_url = url
