@@ -73,7 +73,7 @@ class YoutubeField(models.URLField, metaclass=models.SubfieldBase):
         return YoutubeUrl(url)
 
     def get_prep_value(self, value):
-        return self.to_python(value)
+        return str(value)
 
 
 try:
