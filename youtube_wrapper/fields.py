@@ -13,9 +13,10 @@ from django.utils.translation import ugettext_lazy as _
 
 
 def validate_youtube_url(url):
-    """
-    http://stackoverflow.com/questions/2964678/jquery-youtube-url-validation-with-regex
-    """
+    if not url.origin_url:
+        return
+
+    # http://stackoverflow.com/questions/2964678/jquery-youtube-url-validation-with-regex
     pattern = r'^http:\/\/(?:www\.)?youtube.com\/watch\?(?=.*v=\w+)(?:\S+)?$'
     if url.parsed_url.netloc == 'youtu.be':
         if re.match(r'\w+', url.origin_url) is None:
@@ -61,7 +62,7 @@ class YoutubeUrl(object):
         return self.origin_url
 
 
-class YoutubeField(models.URLField, metaclass=models.SubfieldBase):
+class YoutubeField(models.CharField, metaclass=models.SubfieldBase):
     description = _("Youtube video URL")
 
     def __init__(self, *args, **kwargs):
